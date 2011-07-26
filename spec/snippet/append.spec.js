@@ -7,7 +7,7 @@ describe('append spec', function () {
 
     it('should parse specified template', function () {
         var body = document.getElementsByTagName('body')[0],
-            appended = nodef.append(body, {template: 'test'});
+            appended = nodef.append(body, {template: 'test', document: document});
         expect(appended.innerHTML).toEqual('bar');
     });
 

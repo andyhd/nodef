@@ -1,23 +1,28 @@
 var fs = require('fs'),
     jsdom = require('jsdom').jsdom;
 
-function loadTemplate(filename) {
-    var html = fs.readFile(filename, 'utf8');
-    if (data) {
-        var el = jsdom(data.toString('utf8'));
+function loadTemplate(name) {
+    var html = fs.readFileSync("./template/" + name + ".html", 'utf8');
+    if (html) {
+        return html.toString('utf8').replace(/\s+$/g, '');
     }
-}
-
-function parseTemplate(template) {
+    return null;
 }
 
 exports.append = function (element, args) {
 
     if (args.template) {
-        element.appendChild(parseTemplate(args.template));
+        var src = "";
+        if (src = loadTemplate(args.template)) {
+            var doc = element.ownerDocument,
+                div = doc.createElement("div");
+            div.innerHTML = src;
+            for (var i = 0, j = div.childNodes.length; i < j; i++) {
+                element.appendChild(div.childNodes[i]);
+            }
+        }
     }
 
-    element.appendChild(template);
     return element;
 
 };
