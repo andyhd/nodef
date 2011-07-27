@@ -85,14 +85,8 @@ When used with the template in the template example, the output will look like t
 
 Predefined snippets:
 
-`append`
-: If passed a `snippet` parameter, the result of calling the named function will be appended to the contents of the tag. If passed a `template` parameter, the named template will be parsed and the result appended to the contents of the tag.
-
-`prepend`
-: Like `append` but prepends the results to the contents of the tag
-
 `include`
-: Replaces the tag (and all its contents) with the result of parsing the named template.
+: Requires a `template` parameter. The named template will be parsed and the result will be used to replace the tag.
 
 `wrap`
 : 
