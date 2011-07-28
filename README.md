@@ -88,5 +88,18 @@ Predefined snippets:
 `include`
 : Requires a `template` parameter. The named template will be parsed and the result will be used to replace the tag.
 
-`wrap`
-: 
+## QuickStart ##
+
+Example:
+
+    var nodef = require('nodef');
+
+    function mySnippet(element, args) {
+        var document = element.ownerDocument,
+            hello = document.createTextNode("Hello World!");
+        element.parentNode.replaceChild(hello, element);
+    }
+
+    nodef.SnippetRegistry.add({"mysnippet": mySnippet});
+
+
