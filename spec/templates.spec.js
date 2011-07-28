@@ -17,15 +17,22 @@ describe('Template engine:', function () {
   });
 
   it('should call the snippet named in the nodef marker', function () {
-    if (!nodef.include) {
-      nodef.include = function (element, args) {};
-    }
-    spyOn(nodef, 'include');
-    var parsed = nodef.parse(_document),
-      element = _document.getElementsByTagName('div')[0],
+    spyOn(nodef, 'include').andCallThrough();
+    var element = _document.getElementsByTagName('div')[0],
+      parsed = nodef.parse(_document),
       args = {template: 'test'};
     expect(nodef.include).toHaveBeenCalled();
     expect(nodef.include).toHaveBeenCalledWith(element, args);
+    expect(_document.getElementsByTagName('body')[0].innerHTML).toEqual('bar');
+  });
+
+  it('should recursively parse the dom until all snippets are processed', function () {
+    _document = jsdom('<html><body><div class="nodef:include?template=test-recurse"></div></body></html>');
+    spyOn(nodef, 'include').andCallThrough();
+    var parsed = nodef.parse(_document);
+    expect(nodef.include).toHaveBeenCalled();
+    expect(nodef.include.callCount).toEqual(2);
+    expect(_document.getElementsByTagName('body')[0].innerHTML).toEqual('bar');
   });
 
 });

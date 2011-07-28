@@ -114,9 +114,12 @@ var SnippetRegistry = (function () {
 
 exports.parse = function (document) {
   var tags = exports.snippetTags(document);
+  if (tags.length == 0) {
+    return;
+  }
   for (var i in tags) {
-    var tag = tags[i];
-    var snippet = SnippetRegistry.get(tag.snippet.callable);
+    var tag = tags[i],
+      snippet = SnippetRegistry.get(tag.snippet.callable);
     if (snippet) {
       if (typeof(snippet) == 'object' && snippet.apply && typeof(snippet.apply) == 'function') {
         snippet.apply(tag.element, tag.snippet.args);
@@ -125,5 +128,6 @@ exports.parse = function (document) {
       }
     }
   }
+  exports.parse(document);
 }
 // vim: ts=2 sts=2 sw=2 et ai
