@@ -1,5 +1,5 @@
 var jsdom = require('jsdom').jsdom;
-var nodef = require('../../nodef/nodef.js');
+var nodef = require('../nodef/nodef.js');
 
 describe('Include snippet:', function () {
 

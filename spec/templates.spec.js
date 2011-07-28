@@ -1,5 +1,5 @@
 var jsdom = require('jsdom').jsdom,
-  nodef = require('../../nodef/nodef.js');
+  nodef = require('../nodef/nodef.js');
 
 describe('Template engine:', function () {
 
@@ -21,8 +21,12 @@ describe('Template engine:', function () {
       nodef.include = function (element, args) {};
     }
     spyOn(nodef, 'include');
-    var parsed = nodef.parse(_document);
+    var parsed = nodef.parse(_document),
+      element = _document.getElementsByTagName('div')[0],
+      args = {template: 'test'};
     expect(nodef.include).toHaveBeenCalled();
+    expect(nodef.include).toHaveBeenCalledWith(element, args);
   });
 
 });
+// vim: ts=2 sts=2 sw=2 et ai
