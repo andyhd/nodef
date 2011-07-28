@@ -50,6 +50,7 @@ function parseNodefTag(tag) {
       }
     }
     return {
+      tag: match[0],
       callable: match[1],
       args: args
     };
@@ -63,6 +64,10 @@ function parsedSnippet(element) {
   for (var i in classes) {
     var snippet = parseNodefTag(classes[i]);
     if (snippet) {
+      element.setAttribute("class", element.getAttribute("class").replace(snippet.tag, ""));
+      if (element.getAttribute("class").length < 1) {
+        element.removeAttribute("class");
+      }
       return {
         element: element,
         snippet: snippet
@@ -111,6 +116,8 @@ var SnippetRegistry = (function () {
 
   };
 })();
+
+exports.SnippetRegistry = SnippetRegistry;
 
 exports.parse = function (document) {
   var tags = exports.snippetTags(document);

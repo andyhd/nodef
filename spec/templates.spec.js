@@ -10,10 +10,9 @@ describe('Template engine:', function () {
   });
 
   it('should recognise nodef namespaced class attributes', function () {
-    var snippets = nodef.snippetTags(_document);
-    expect(snippets.length).toEqual(1);
-    expect(snippets[0].element.tagName).toEqual("DIV");
-    expect(snippets[0].element.getAttribute("class").indexOf("nodef:")).toEqual(0);
+    var tags = nodef.snippetTags(_document);
+    expect(tags.length).toEqual(1);
+    expect(tags[0].element.tagName).toEqual("DIV");
   });
 
   it('should call the snippet named in the nodef marker', function () {
