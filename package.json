@@ -1,0 +1,29 @@
+{
+  "name": "nodef",
+  "version": "0.1.1",
+  "description": "A web framework inspired by Lift",
+  "author": "Andy Driver <andy@pagezero.net>",
+  "keywords": [
+    "framework"
+  ],
+  "maintainers": "Andy Driver <andy@pagezero.net>",
+  "bugs": {
+    "web": "http://github.com/andyhd/nodef/issues"
+  },
+  "licenses": ["MIT"],
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/andyhd/nodef.git"
+  },
+  "dependencies": {
+    "jsdom": ">=0.2.1"
+  },
+  "devDependencies": {
+    "jasmine-node": ">=1.0.6"
+  },
+  "engines": { "node": ">=0.1.9" },
+  "directories": {
+    "lib": "./lib/nodef"
+  },
+  "main": "./lib/nodef"
+}
