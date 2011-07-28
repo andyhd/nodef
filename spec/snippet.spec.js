@@ -1,5 +1,5 @@
 var jsdom = require('jsdom').jsdom,
-  nodef = require('../nodef/nodef.js');
+  nodef = require('nodef');
 
 describe('User Defined Snippet:', function () {
 
