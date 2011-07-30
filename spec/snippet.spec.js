@@ -27,6 +27,14 @@ describe('User Defined Snippet:', function () {
     var body = _document.getElementsByTagName('body')[0];
     nodef.parse(_document);
     expect(body.innerHTML).toEqual('<div>Hello foo!</div>');
+
+    nodef.SnippetRegistry.remove("hello");
+  });
+
+  it('should display an error message if the specified snippet is not registered', function () {
+    var body = _document.getElementsByTagName('body')[0];
+    nodef.parse(_document);
+    expect(body.innerHTML).toEqual('<div>ERROR: hello snippet not registered</div>');
   });
 
 });
