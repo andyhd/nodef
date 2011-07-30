@@ -90,7 +90,19 @@ Predefined snippets:
 
 ## QuickStart ##
 
-Example:
+View First:
+
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Hello World!</title>
+      </head>
+      <body>
+        <div class="nodef:mysnippet">Hi</div>
+      </body>
+    </html>
+
+Snippet Example:
 
     var nodef = require('nodef');
 
