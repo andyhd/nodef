@@ -9,6 +9,16 @@ describe('Template engine:', function () {
     _document = jsdom('<html><body><div class="nodef:include?template=test"></div></body></html>');
   });
 
+  it('should load the named template from the configured templates directory', function () {
+    var html = nodef.loadTemplate('test');
+    expect(html).toEqual('bar');
+  });
+
+  it('should return null if the named template is not found', function () {
+    var err = "EBADF, Bad file descriptor './template/non-existent.html'";
+    expect(function () {nodef.loadTemplate('non-existent')}).toThrow(err);
+  });
+
   it('should recognise nodef namespaced class attributes', function () {
     var tags = nodef.snippetTags(_document);
     expect(tags.length).toEqual(1);
