@@ -37,5 +37,20 @@ describe('User Defined Snippet:', function () {
     expect(body.innerHTML).toEqual('<div>ERROR: hello snippet not registered</div>');
   });
 
+  it('should call a snippet object\'s apply method', function () {
+    var div = _document.getElementsByTagName('div')[0],
+      testSnippet = {
+        apply: function (elem, args) {
+          elem.innerHTML = 'foo';
+          return elem;
+        }
+      };
+    nodef.SnippetRegistry.add("hello", testSnippet);
+    spyOn(testSnippet, 'apply').andCallThrough();
+    nodef.parse(_document);
+    expect(testSnippet.apply).toHaveBeenCalled();
+    expect(div.innerHTML).toEqual('foo');
+  });
+
 });
 // vim: ts=2 sts=2 sw=2 et ai
