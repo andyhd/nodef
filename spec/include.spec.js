@@ -12,7 +12,8 @@ describe('Include snippet:', function () {
   it('should replace the tag with the parsed specified template', function () {
     var tag = _document.getElementsByTagName('div')[0],
       body = _document.getElementsByTagName('body')[0],
-      included = nodef.include(tag, {template: 'test'});
+      included = nodef.SnippetRegistry.get('include').apply(tag, {template: 'test'});
+
     expect(included.length).toEqual(1);
     expect(included[0].nodeName).toEqual('#text');
     expect(included[0].nodeValue).toEqual('bar');
@@ -22,7 +23,7 @@ describe('Include snippet:', function () {
   it('should include an error message if the template is not found', function () {
     var body = _document.getElementsByTagName('body')[0],
       tag = _document.getElementsByTagName('div')[0],
-      included = nodef.include(tag, {template: 'non-existent'});
+      included = nodef.SnippetRegistry.get('include').apply(tag, {template: 'non-existent'});
     expect(body.innerHTML).toEqual('<div class="nodef-error">non-existent template not found</div>');
   });
 
