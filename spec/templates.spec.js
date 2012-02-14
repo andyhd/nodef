@@ -1,50 +1,126 @@
-var jsdom = require('jsdom').jsdom,
-  nodef = require('nodef');
+var nodef = require('nodef');
 
-describe('Template engine:', function () {
+function testRes() {
+  return {
+    writeHead: jasmine.createSpy('writeHead'),
+    write: jasmine.createSpy('write'),
+    end: jasmine.createSpy('end')
+  };
+}
 
-  var _document = null;
+describe('Template Engine:', function () {
 
-  beforeEach(function () {
-    _document = jsdom('<html><body><div class="nodef:include?template=test"></div></body></html>');
-  });
+  it('should pass through to the next filter if the requested resource is not found',
+    function () {
+      runs(function () {
+        var req = { url: '/foo/bar/quux' },
+            res = testRes();
+        this.next = jasmine.createSpy('next');
+        nodef.filter(req, res, this.next);
+      });
 
-  it('should load the named template from the configured templates directory', function () {
-    var html = nodef.loadTemplate('test');
-    expect(html).toEqual('bar');
-  });
+      waitsFor(function () {
+        return this.next.wasCalled;
+      }, 'next to be called', 500);
+    }
+  );
 
-  it('should return null if the named template is not found', function () {
-    var err = "EBADF, Bad file descriptor './template/non-existent.html'";
-    expect(function () {nodef.loadTemplate('non-existent')}).toThrow(err);
-  });
+  it('should output a template with no nodef tags unchanged',
+    function () {
+      runs(function () {
+        var req = { url: '/no-tags.html' },
+            next = function () {};
+        this.res = testRes();
+        this.result = '<html><body>no nodef tags here</body></html>\n';
+        nodef.filter(req, this.res, next);
+      });
 
-  it('should recognise nodef namespaced class attributes', function () {
-    var tags = nodef.snippetTags(_document);
-    expect(tags.length).toEqual(1);
-    expect(tags[0].element.tagName).toEqual("DIV");
-  });
+      waitsFor(function () {
+        return this.res.end.wasCalled;
+      }, 'response to be returned', 500);
 
-  it('should call the snippet named in the nodef marker', function () {
-    var element = _document.getElementsByTagName('div')[0],
-      args = {template: 'test'},
-      include = nodef.SnippetRegistry.get('include');
-    spyOn(include, 'apply').andCallThrough();
-    nodef.parse(_document);
-    expect(include.apply).toHaveBeenCalled();
-    expect(include.apply).toHaveBeenCalledWith(element, args);
-    expect(_document.getElementsByTagName('body')[0].innerHTML).toEqual('bar');
-  });
+      runs(function () {
+        expect(this.res.write).toHaveBeenCalledWith(this.result);
+      });
+    }
+  );
 
-  it('should recursively parse the dom until all snippets are processed', function () {
-    _document = jsdom('<html><body><div class="nodef:include?template=test-recurse"></div></body></html>');
-    var include = nodef.SnippetRegistry.get('include');
-    spyOn(include, 'apply').andCallThrough();
-    nodef.parse(_document);
-    expect(include.apply).toHaveBeenCalled();
-    expect(include.apply.callCount).toEqual(2);
-    expect(_document.getElementsByTagName('body')[0].innerHTML).toEqual('bar');
-  });
+  it('should transform the nodef tagged elements in a template',
+    function () {
+      runs(function () {
+        var req = { url: '/test.html' },
+            next = function () {};
+        this.res = testRes();
+        this.result = '<html><body>bar</body></html>\n';
+        nodef.filter(req, this.res, next);
+      });
+
+      waitsFor(function () {
+        return this.res.end.wasCalled;
+      }, 'response to be returned', 500);
+
+      runs(function () {
+        expect(this.res.write).toHaveBeenCalledWith(this.result);
+      });
+    }
+  );
+
+  it('should replace a tag with the return value of the specified snippet',
+    function () {
+
+      // register a new snippet
+      nodef.SnippetRegistry.add("hello", function (el, args) {
+        var nodes = el.getElementsByClassName("name"),
+          document = el.ownerDocument;
+        for (var i = 0; i < nodes.length; i++) {
+          var text = document.createTextNode(args.name),
+            parent = nodes[i].parentNode;
+          parent.replaceChild(text, nodes[i]);
+        }
+        return el;
+      });
+
+      var input = '<html><body><div class="nodef:hello?name=foo">Hello <b class="name"/>!</div></body></html>',
+          expected = '<html><body><div>Hello foo!</div></body></html>';
+      expect(nodef.transformTemplate(input)).toEqual(expected);
+
+      // tidy up
+      nodef.SnippetRegistry.remove("hello");
+    }
+  );
+
+  it('should display an error message if the specified snippet is not registered',
+    function () {
+      var input = '<html><body><div class="nodef:hello"></div></body></html>',
+          expected = '<html><body><div>ERROR: hello snippet not registered</div></body></html>';
+      expect(nodef.transformTemplate(input)).toEqual(expected);
+    }
+  );
+
+  it("should call a snippet object's apply method",
+    function () {
+      var input = '<html><body><div class="nodef:hello">bar</div></body></html>',
+          expected = '<html><body><div>foo</div></body></html>',
+          testSnippet = {
+            apply: function (el, args) {
+              el.innerHTML = 'foo';
+              return el;
+            }
+          };
+      nodef.SnippetRegistry.add('hello', testSnippet);
+      spyOn(testSnippet, 'apply').andCallThrough();
+      expect(nodef.transformTemplate(input)).toEqual(expected);
+      expect(testSnippet.apply).toHaveBeenCalled();
+    }
+  );
+
+  it('should recursively parse the dom until all snippets are processed',
+    function () {
+      var input = '<html><body><div class="nodef:include?template=test-recurse"></div></body></html>',
+          expected = '<html><body>bar</body></html>';
+      expect(nodef.transformTemplate(input)).toEqual(expected);
+    }
+  );
 
 });
 // vim: ts=2 sts=2 sw=2 et ai

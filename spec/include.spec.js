@@ -1,30 +1,17 @@
-var jsdom = require('jsdom').jsdom,
-  nodef = require('nodef');
+var nodef = require('nodef');
 
 describe('Include snippet:', function () {
 
-  var _document = null;
-
-  beforeEach(function () {
-    _document = jsdom('<html><body><div class="nodef:include?template=test"></div></body></html>');
-  });
-
   it('should replace the tag with the parsed specified template', function () {
-    var tag = _document.getElementsByTagName('div')[0],
-      body = _document.getElementsByTagName('body')[0],
-      included = nodef.SnippetRegistry.get('include').apply(tag, {template: 'test'});
-
-    expect(included.length).toEqual(1);
-    expect(included[0].nodeName).toEqual('#text');
-    expect(included[0].nodeValue).toEqual('bar');
-    expect(body.innerHTML).toEqual('bar');
+    var input = '<html><body><div class="nodef:include?template=test"></div></body></html>',
+        expected = '<html><body>bar</body></html>';
+    expect(nodef.transformTemplate(input)).toEqual(expected);
   });
 
   it('should include an error message if the template is not found', function () {
-    var body = _document.getElementsByTagName('body')[0],
-      tag = _document.getElementsByTagName('div')[0],
-      included = nodef.SnippetRegistry.get('include').apply(tag, {template: 'non-existent'});
-    expect(body.innerHTML).toEqual('<div class="nodef-error">non-existent template not found</div>');
+    var input = '<html><body><div class="nodef:include?template=non-existent"></div></body></html>',
+        expected = '<html><body><div class="nodef-error">Error: Failed loading template non-existent</div></body></html>';
+    expect(nodef.transformTemplate(input)).toEqual(expected);
   });
 
 });

@@ -19,15 +19,14 @@
 
 Example:
 
-    routes = {
-        "/images/*": { static: true },
-        "/books": { action: book_handler },
-        "/books": { action: book_handler, method: "POST" },
-        "/books/id": { action: library.book },
-        "/books/:id/page/:num": { action: library.book },
-        "/books/deprecated_url": { redirect: "/books/foo", permanent: true },
-        "/books/delete": { action: library.delete_book, method: "POST", if: user.is_admin, else: forbidden }
-    }
+    routes.append({
+        "/books": book_handler,
+        post("/books"): book_handler,
+        "/books/:id": Library.book,
+        "/books/:id/page/:num": Library.book,
+        "/books/deprecated_url": Redirect("/books/foo").permanent(),
+        post("/books/delete"): If(user.is_admin).then(library.delete_book).else(forbidden)
+    });
 
 Keywords:
 
@@ -87,6 +86,15 @@ Predefined snippets:
 
 `include`
 : Requires a `template` parameter. The named template will be parsed and the result will be used to replace the tag.
+
+`surround`
+: Requires `with` and `at` parameters. The tag will be embedded into the template specified by `with`, replacing the element with the id specified by `at`.
+
+`merge_head`
+: The contents of the tag will be merged into the `head` tag of the document. If one of the children of this tag is a `title` tag, it will replace any existing `title` tag.
+
+`merge_tail`
+: The contents of the tag will be moved to the end of the `body` tag of the document.
 
 ## QuickStart ##
 
